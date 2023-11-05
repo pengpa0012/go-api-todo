@@ -45,17 +45,23 @@ func deleteTodo(c *gin.Context) {
 	for index, todo := range todos {
 			if todo.ID == todoID {
 					todos = append(todos[:index], todos[index+1:]...)
-					c.IndentedJSON(http.StatusNoContent, nil) 
+					c.IndentedJSON(http.StatusCreated, "Todo Deleted") 
 					return
 			}
 	}
   c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Todo item not found"})
 }
 
-func toggleTodo(c *gin.Context) {
-	// todoID := c.Param("id")
-	// find todo and toggle completed
-	c.IndentedJSON(http.StatusOK, todos)
+func toggleCompleted(c *gin.Context) {
+	todoID := c.Param("id")
+	for index, todo := range todos {
+		if todo.ID == todoID {
+				todos[index].Completed = !todos[index].Completed
+				c.IndentedJSON(http.StatusCreated, "Todo toggled") 
+				return
+		}
+}
+c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Todo item not found"})
 }
 
 func main() {
@@ -64,7 +70,7 @@ func main() {
 	router.GET("/todos", getTodos)
 	router.POST("/addTodo", addTodo)
 	router.DELETE("/deleteTodo/:id", deleteTodo)
-	router.PATCH("/toggleTodo", toggleTodo)
+	router.PATCH("/toggleCompleted/:id", toggleCompleted)
 
 	router.Run("localhost:8080")
 }
