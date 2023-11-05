@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -30,15 +29,32 @@ func addTodo(c *gin.Context) {
 		return
 	}
 
+	for _, todo := range todos {
+		if todo.ID == newTodo.ID {
+				c.JSON(http.StatusConflict, gin.H{"error": "ID already exists"})
+				return
+		}
+	}
+
 	todos = append(todos, newTodo)
 	c.IndentedJSON(http.StatusCreated, newTodo)
 }
 
 func deleteTodo(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, todos)
+	todoID := c.Param("id")
+	for index, todo := range todos {
+			if todo.ID == todoID {
+					todos = append(todos[:index], todos[index+1:]...)
+					c.IndentedJSON(http.StatusNoContent, nil) 
+					return
+			}
+	}
+  c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Todo item not found"})
 }
 
 func toggleTodo(c *gin.Context) {
+	// todoID := c.Param("id")
+	// find todo and toggle completed
 	c.IndentedJSON(http.StatusOK, todos)
 }
 
@@ -47,7 +63,7 @@ func main() {
 
 	router.GET("/todos", getTodos)
 	router.POST("/addTodo", addTodo)
-	router.POST("/deleteTodo", deleteTodo)
+	router.DELETE("/deleteTodo/:id", deleteTodo)
 	router.PATCH("/toggleTodo", toggleTodo)
 
 	router.Run("localhost:8080")
