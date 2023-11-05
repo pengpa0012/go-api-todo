@@ -1,23 +1,28 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-type todo struct {
-	ID     string  `json:"id"`
-	Title  string  `json:"title"`
-	Completed  bool `json:"completed"`
+type Todo struct {
+	ID     string  `bson:"_id,omitempty"`
+	Title  string  `bson:"title"`
+	Completed  bool `bson:"completed"`
 }
 
-var todos = []todo{
+var todos = []Todo{
 	{ID: "1", Title: "Wake up", Completed: false},
 	{ID: "2", Title: "Eat", Completed: false},
 	{ID: "3", Title: "Work", Completed: false},
 
 }
 
+var todosCollection *mongo.Collection
 
 func getTodos(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, todos)
@@ -66,6 +71,18 @@ c.IndentedJSON(http.StatusNotFound, gin.H{"error": "Todo item not found"})
 
 func main() {
 	router := gin.Default()
+
+	// Initialize MongoDB client and collection
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	if err != nil {
+			panic(err)
+	}
+	ctx, _ := context.WithTimeout(context.Background(), 10)
+	err = client.Connect(ctx)
+	if err != nil {
+			panic(err)
+	}
+	todosCollection = client.Database("go-todo-db").Collection("todos")
 
 	router.GET("/todos", getTodos)
 	router.POST("/addTodo", addTodo)
