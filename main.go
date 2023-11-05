@@ -16,7 +16,7 @@ var todos = []todo{
 	{ID: "1", Title: "Wake up", Completed: false},
 	{ID: "2", Title: "Eat", Completed: false},
 	{ID: "3", Title: "Work", Completed: false},
-	
+
 }
 
 
@@ -25,7 +25,13 @@ func getTodos(c *gin.Context) {
 }
 
 func addTodo(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, todos)
+	var newTodo todo
+	if err := c.BindJSON(&newTodo); err != nil {
+		return
+	}
+
+	todos = append(todos, newTodo)
+	c.IndentedJSON(http.StatusCreated, newTodo)
 }
 
 func deleteTodo(c *gin.Context) {
