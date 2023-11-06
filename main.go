@@ -4,6 +4,7 @@ import (
 	// "context"
 	"net/http"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 	// "go.mongodb.org/mongo-driver/mongo"
 	// "go.mongodb.org/mongo-driver/mongo/options"
 	// "go.mongodb.org/mongo-driver/bson"
@@ -83,6 +84,14 @@ func main() {
 	// 		panic(err)
 	// }
 	// todosCollection = client.Database("go-todo-db").Collection("todos")
+
+	// Enable CORS
+	router.Use(cors.New(cors.Config{
+    AllowOrigins:     []string{"http://127.0.0.1:5500"},
+    AllowHeaders:     []string{"Origin", "hx-current-url", "hx-request"},
+    ExposeHeaders:    []string{"Content-Length"},
+    AllowCredentials: true,
+  }))
 
 	router.GET("/todos", getTodos)
 	router.POST("/addTodo", addTodo)
