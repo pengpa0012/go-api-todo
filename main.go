@@ -1,12 +1,12 @@
 package main
 
 import (
-	"context"
+	// "context"
 	"net/http"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/bson"
+	// "go.mongodb.org/mongo-driver/mongo"
+	// "go.mongodb.org/mongo-driver/mongo/options"
+	// "go.mongodb.org/mongo-driver/bson"
 )
 
 type Todo struct {
@@ -22,14 +22,14 @@ var todos = []Todo{
 
 }
 
-var todosCollection *mongo.Collection
+// var todosCollection *mongo.Collection
 
 func getTodos(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, todos)
 }
 
 func addTodo(c *gin.Context) {
-	var newTodo todo
+	var newTodo Todo
 	if err := c.BindJSON(&newTodo); err != nil {
 		return
 	}
@@ -73,16 +73,16 @@ func main() {
 	router := gin.Default()
 
 	// Initialize MongoDB client and collection
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
-	if err != nil {
-			panic(err)
-	}
-	ctx, _ := context.WithTimeout(context.Background(), 10)
-	err = client.Connect(ctx)
-	if err != nil {
-			panic(err)
-	}
-	todosCollection = client.Database("go-todo-db").Collection("todos")
+	// client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://127.0.0.1:27017"))
+	// if err != nil {
+	// 		panic(err)
+	// }
+	// ctx, _ := context.WithTimeout(context.Background(), 10)
+	// err = client.Connect(ctx)
+	// if err != nil {
+	// 		panic(err)
+	// }
+	// todosCollection = client.Database("go-todo-db").Collection("todos")
 
 	router.GET("/todos", getTodos)
 	router.POST("/addTodo", addTodo)
